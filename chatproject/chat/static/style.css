@@ -127,14 +127,21 @@ body {
 	text-align: right;
 }
 
-.sign-out {
+.nav_user_name {
 	font-family: Verdana, Geneva, Tahoma, sans-serif;
 	text-decoration: none;
 	color: #333;
 	transition: 0.3s;
 }
 
-.sign-out:hover {
+.nav_sign-out {
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	text-decoration: none;
+	color: #333;
+	transition: 0.3s;
+}
+
+.nav_sign-out:hover {
 	cursor: pointer;
 	color: #1d5a97;
 	transition: 0.3s;
