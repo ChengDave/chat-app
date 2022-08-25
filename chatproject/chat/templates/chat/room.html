@@ -12,8 +12,8 @@
     <a class="leaveButton" href="{% url 'index' %}">Leave Room</a>
     
     <div class="container">
-        <div id="chat-log"></div>
-        {% for chat in chats.all %}
+        <div id="chat-log">    
+            {% for chat in chats.all %}
             {% if chat.user.id == request.user.id %}
             <div class="message sender">
                 {{ chat.content }}
@@ -23,7 +23,8 @@
                 {{ chat.content }}
             </div>
             {% endif %}
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 
     <div class="container">
