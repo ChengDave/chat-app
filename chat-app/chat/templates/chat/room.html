@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Room</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+</head>
+
+<body>
+    {% include 'chat/nav.html' %}
+    <a class="leaveButton" href="{% url 'index' %}">Leave Room</a>
+    
+    <div class="container">
+        <div id="chat-log">    
+            {% for chat in chats.all %}
+            {% if chat.user.username == request.user.username %}
+            <div class="user_name sender_name">
+                {{ chat.user.username }}
+            </div>
+            <div class="message sender">
+                {{ chat.content }}
+            </div>
+            {% else %}
+            <div class="user_name receiver_name">
+                {{ chat.user.username }}
+            </div>
+            <div class="message receiver">
+                {{ chat.content }}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="container">
+        <input class="textInput" id="chat-message-input" type="text" size="100"><br>
+        <input class="button" id="chat-message-submit" type="button" value="Send">
+        {{ room_name|json_script:"room-name" }}
+    </div>
+
+    {{ request.user.username|json_script:"user_name" }}
+
+    <script>
+        const chatLog = document.querySelector('#chat-log')
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+
+
+            if (chatLog.childNodes.length<=1) {
+                const emptyText = document.createElement('h3')
+                emptyText.id = 'emptyText'
+                emptyText.innerText = 'Welcome to the Chat'
+                emptyText.className = 'emptyText'
+                chatLog.appendChild(emptyText)
+            }
+
+            const chatSocket = new WebSocket(
+                'ws://'
+                + window.location.host
+                + '/ws/chat/'
+                + roomName
+                + '/'
+            );
+
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                const messageElement = document.createElement('div')
+                const user_name = data['user_name']
+                const loggedInUserId = JSON.parse(document.getElementById('user_name').textContent)
+                console.log(loggedInUserId)
+                messageElement.innerText = data.message
+
+                const usernameElement = document.createElement('div')
+                usernameElement.innerText = data['user_name']
+
+
+                if (user_name === loggedInUserId) {
+                    usernameElement.classList.add('user_name', 'sender_name')
+                    messageElement.classList.add('message', 'sender')
+
+                } else {
+                    usernameElement.classList.add('user_name', 'receiver_name')
+                    messageElement.classList.add('message', 'receiver')
+                }
+                
+                chatLog.appendChild(usernameElement)
+                chatLog.appendChild(messageElement)
+
+                if (document.querySelector('#emptyText')) {
+                    document.querySelector('#emptyText').remove()
+                }
+            }; 
+
+            chatSocket.onclose = function(e) {
+                console.error('Chat socket closed unexpectedly');
+            };
+
+            document.querySelector('#chat-message-input').focus();
+            document.querySelector('#chat-message-input').onkeyup = function(e) {
+                if (e.keyCode === 13) {  // enter, return
+                    document.querySelector('#chat-message-submit').click();
+                }
+            };
+
+            document.querySelector('#chat-message-submit').onclick = function(e) {
+                const messageInputDom = document.querySelector('#chat-message-input');
+                const message = messageInputDom.value;
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+                messageInputDom.value = '';
+            };
+    </script>
+</body>
+</html>
