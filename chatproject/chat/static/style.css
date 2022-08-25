@@ -76,8 +76,26 @@ body {
 	margin-left: auto;
 }
 
+
 .receiver {
 	background-color: #62bd56;
+}
+
+.user_name {
+	color:  #000000;
+	font-family: 'Poppins', sans-serif;
+	font-style: italic;
+	height: 8px;
+}
+
+.sender_name {
+	position: relative;
+	margin-left: auto;
+
+}
+
+.receiver_name {
+	position: relative;
 }
 
 
